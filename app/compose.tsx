@@ -5,6 +5,8 @@ import {
   StyleSheet,
   TextInput,
   View,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useLocalSearchParams, useRouter } from 'expo-router';
@@ -17,8 +19,6 @@ import { Avatar, Chip, Icon, Touchable, VText, haptic } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius, space, type, typography } from '@/theme/tokens';
 import { TOPICS } from '@/data/topics';
-import { KeyboardAwareScrollView, KeyboardStickyView } from 'react-native-keyboard-controller';
-import { useComposerInset } from '@/lib/useComposerInset';
 import { useVybe, useAuthor, usePost } from '@/store/useVybe';
 import { useAuth } from '@/store/useAuth';
 import { uploadImage } from '@/services/db';
@@ -47,7 +47,6 @@ export default function ComposeScreen() {
   const [sheet, setSheet] = useState<'audience' | 'topics' | null>(null);
   const [publishing, setPublishing] = useState(false);
   const profile = useVybe((s) => s.profile);
-  const footerInset = useComposerInset(space.sm);
   const [error, setError] = useState<string | null>(null);
 
   const [pollOn, setPollOn] = useState(!!seed?.poll);
@@ -184,11 +183,14 @@ export default function ComposeScreen() {
   const audienceSummary = summarise(boundary, circles);
 
   return (
-    <View style={{ flex: 1 }}>
+    <KeyboardAvoidingView
+      style={{ flex: 1, backgroundColor: c.surface }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
       <AmbientAura intensity={0.7} />
       
       {/* Top Navigation Bar */}
-      <View style={[styles.bar, { paddingTop: insets.top + space.md }]}>
+      <View style={[styles.bar, { paddingTop: insets.top + space.sm }]}>
         <Touchable onPress={close} feedback="light" hitSlop={10} accessibilityLabel="Close">
           <VText variant="label">Cancel</VText>
         </Touchable>
@@ -211,18 +213,19 @@ export default function ComposeScreen() {
         </Touchable>
       </View>
 
-      {/* Redesigned Fluid Scrolling Container */}
-      <KeyboardAwareScrollView
+      {/* Fluid Scrolling Container */}
+      <ScrollView
         style={{ flex: 1 }}
         contentContainerStyle={{
           padding: space.base,
-          paddingBottom: 140,
+          paddingBottom: 100,
+          gap: space.md,
         }}
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.writeRow}>
-          <Avatar uri={profile.avatar} size={40} />
+          <Avatar uri={profile.avatar} size={42} />
 
           <View style={{ flex: 1, gap: space.md }}>
             <TextInput
@@ -289,7 +292,7 @@ export default function ComposeScreen() {
             ) : null}
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      </ScrollView>
 
       {error ? (
         <VText variant="caption" color={c.danger} style={{ textAlign: 'center', paddingBottom: space.sm }}>
@@ -297,63 +300,61 @@ export default function ComposeScreen() {
         </VText>
       ) : null}
 
-      {/* Keyboard-Pinned Sticky Toolbar */}
-      <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-        <View style={[styles.footer, { borderTopColor: c.divider, backgroundColor: c.surface, paddingBottom: footerInset || space.md }]}>
-          <Touchable
+      {/* Redesigned Floating Toolbar Footer */}
+      <View style={[styles.footer, { borderTopColor: c.divider, backgroundColor: c.surfaceElevated, paddingBottom: Math.max(insets.bottom, space.sm) }]}>
+        <Touchable
+          onPress={() => {
+            haptic('light');
+            setSheet('audience');
+          }}
+          feedback="none"
+          style={styles.audiencePill}
+          accessibilityLabel={`${audienceSummary}. Change who sees this.`}
+        >
+          <Icon name={audienceSummary.startsWith('Everyone') ? 'globe' : 'users'} size={14} color={c.primary} />
+          <VText variant="micro" color={c.primary}>
+            {audienceSummary}
+          </VText>
+        </Touchable>
+
+        <View style={[styles.toolDivider, { backgroundColor: c.divider }]} />
+
+        <View style={styles.tools}>
+          <Tool
+            glyph="image"
+            label="Add photos"
+            disabled={media.length >= MAX_MEDIA}
+            onPress={pickPhotos}
+          />
+          <Tool glyph="camera" label="Take a photo" disabled={media.length >= MAX_MEDIA} onPress={takePhoto} />
+          <Tool
+            glyph="bar-chart-2"
+            label="Add a poll"
+            active={pollOn}
+            onPress={() => {
+              haptic('select');
+              setPollOn((v) => !v);
+            }}
+          />
+          <Tool
+            glyph="hash"
+            label="Tag topics"
+            active={chosenTopics.length > 0}
             onPress={() => {
               haptic('light');
-              setSheet('audience');
+              setSheet('topics');
             }}
-            feedback="none"
-            style={styles.audiencePill}
-            accessibilityLabel={`${audienceSummary}. Change who sees this.`}
-          >
-            <Icon name={audienceSummary.startsWith('Everyone') ? 'globe' : 'users'} size={14} color={c.primary} />
-            <VText variant="micro" color={c.primary}>
-              {audienceSummary}
+          />
+
+          <View style={{ flex: 1 }} />
+
+          {body.length > 0 ? (
+            <VText variant="micro" muted>
+              {body.trim().length}
             </VText>
-          </Touchable>
-
-          <View style={[styles.toolDivider, { backgroundColor: c.divider }]} />
-
-          <View style={styles.tools}>
-            <Tool
-              glyph="image"
-              label="Add photos"
-              disabled={media.length >= MAX_MEDIA}
-              onPress={pickPhotos}
-            />
-            <Tool glyph="camera" label="Take a photo" disabled={media.length >= MAX_MEDIA} onPress={takePhoto} />
-            <Tool
-              glyph="bar-chart-2"
-              label="Add a poll"
-              active={pollOn}
-              onPress={() => {
-                haptic('select');
-                setPollOn((v) => !v);
-              }}
-            />
-            <Tool
-              glyph="hash"
-              label="Tag topics"
-              active={chosenTopics.length > 0}
-              onPress={() => {
-                haptic('light');
-                setSheet('topics');
-              }}
-            />
-
-            <View style={{ flex: 1 }} />
-
-            {body.length > 0 ? (
-              <VText variant="micro" muted>
-                {body.trim().length}
-              </VText>
-            ) : null}
-          </View>
+          ) : null}
         </View>
-      </KeyboardStickyView>
+      </View>
 
       <Sheet
         visible={sheet !== null}
@@ -388,7 +389,7 @@ export default function ComposeScreen() {
           <AudiencePicker circles={circles} value={boundary} onChange={setBoundary} />
         )}
       </Sheet>
-    </View>
+    </KeyboardAvoidingView>
   );
 }
 
@@ -831,8 +832,8 @@ const styles = StyleSheet.create({
     minHeight: 30,
   },
   toolDivider: { height: StyleSheet.hairlineWidth, width: '100%' },
-  tools: { flexDirection: 'row', alignItems: 'center', gap: space.lg, minHeight: 44 },
-  tool: { width: 32, height: 40, alignItems: 'center', justifyContent: 'center' },
+  tools: { flexDirection: 'row', alignItems: 'center', gap: space.lg, minHeight: 46 },
+  tool: { width: 36, height: 42, alignItems: 'center', justifyContent: 'center' },
   sheetBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.55)', justifyContent: 'flex-end' },
   sheet: {
     borderTopLeftRadius: radius.xxl,
@@ -854,12 +855,13 @@ const styles = StyleSheet.create({
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   input: {
-    minHeight: 140,
+    minHeight: 180,
     paddingTop: 4,
     textAlignVertical: 'top',
     fontFamily: typography.regular,
-    fontSize: 18,
-    lineHeight: 26,
+    fontSize: 19,
+    lineHeight: 28,
+    borderWidth: 0, // Removed the ugly box border!
   },
   quotedBox: {
     borderRadius: radius.md,
