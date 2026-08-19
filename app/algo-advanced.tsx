@@ -172,37 +172,39 @@ function TemporaryModes() {
         }
       />
 
-      {picking ? (
-        <Animated.View entering={FadeIn} style={styles.picker}>
-          {TOPICS.map((t) => (
-            <Chip
-              key={t.id}
-              size="sm"
-              label={`+ ${t.label} · 3d`}
-              tone={t.hue}
-              onPress={() => {
-                addMode({
-                  label: `More ${t.label}`,
-                  topicId: t.id,
-                  delta: 0.6,
-                  expiresAt: Date.now() + 3 * 86_400_000,
-                });
-                setPicking(false);
-              }}
-            />
-          ))}
-        </Animated.View>
-      ) : null}
+      <View style={{ gap: space.md }}>
+        {picking ? (
+          <Animated.View entering={FadeIn} style={styles.picker}>
+            {TOPICS.map((t) => (
+              <Chip
+                key={t.id}
+                size="sm"
+                label={`+ ${t.label} · 3d`}
+                tone={t.hue}
+                onPress={() => {
+                  addMode({
+                    label: `More ${t.label}`,
+                    topicId: t.id,
+                    delta: 0.6,
+                    expiresAt: Date.now() + 3 * 86_400_000,
+                  });
+                  setPicking(false);
+                }}
+              />
+            ))}
+          </Animated.View>
+        ) : null}
 
-      {modes.length === 0 && !picking ? (
-        <Block style={styles.note}>
-          <Icon name="clock" size={15} color={c.textMuted} />
-          <VText variant="caption" muted style={{ flex: 1 }}>
-            Nothing timed is running. A boost set today is gone by itself on the day it expires —
-            you never have to remember to undo it.
-          </VText>
-        </Block>
-      ) : null}
+        {modes.length === 0 && !picking ? (
+          <Block style={styles.note}>
+            <Icon name="clock" size={15} color={c.textMuted} />
+            <VText variant="caption" muted style={{ flex: 1 }}>
+              Nothing timed is running. A boost set today is gone by itself on the day it expires —
+              you never have to remember to undo it.
+            </VText>
+          </Block>
+        ) : null}
+      </View>
 
       {modes.map((m) => {
         const total = m.expiresAt - m.startedAt;
