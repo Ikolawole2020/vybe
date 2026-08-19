@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { DeviceEventEmitter, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Animated, {
@@ -28,27 +28,6 @@ const TABS: TabMeta[] = [
 
 type Slot = { x: number; width: number };
 
-/**
- * Floating pill navigation.
- *
- * Only the active tab carries its label — it expands into a filled pill and the
- * others collapse to their glyph, so the bar names where you are without
- * spending four labels' worth of width on it. Compose sits inline at the centre
- * of the run rather than as a separate button: it is the one action here, and a
- * detached FAB would compete with the active pill for the same emphasis.
- *
- * On iOS 26 the bar is real Liquid Glass; elsewhere it falls back to a solid
- * near-black plate, which is what the design assumes anyway.
- */
-/**
- * Only what this bar actually reads.
- *
- * Expo Router 57 bundles its own copy of React Navigation, so the types from a
- * separately installed `@react-navigation/bottom-tabs` describe different
- * classes and will not structurally match — including on private fields, which
- * no `Pick` can reconcile. Declaring the two fields used here keeps the bar
- * typed against the navigator that actually renders it.
- */
 type TabBarProps = {
   state: { index: number; routes: { key: string; name: string }[] };
   navigation: {
@@ -77,11 +56,6 @@ export function LiquidTabBar({ state, navigation }: TabBarProps) {
     w.value = withSpring(active.width, spring.snappy);
   }, [active, x, w]);
 
-  // The pill is volt, always. It used to desaturate toward a neutral surface as
-  // the attention budget was spent — a nudge that in practice just looked like
-  // the accent colour was broken, because nothing on screen connected the grey
-  // pill to the limit. The budget says its piece in words in the feed footer,
-  // where it can actually be understood.
   const indicator = useAnimatedStyle(() => ({
     transform: [{ translateX: x.value }],
     width: w.value,
@@ -129,17 +103,25 @@ export function LiquidTabBar({ state, navigation }: TabBarProps) {
               onPress={() => {
                 const route = state.routes.find((r: { name: string }) => r.name === tab.name);
                 if (!route) return;
+
                 const event = navigation.emit({
                   type: 'tabPress',
                   target: route.key,
                   canPreventDefault: true,
                 });
-                if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
+
+                if (focused) {
+                  // If already on Feed, trigger scroll-to-top and refresh
+                  if (tab.name === 'index') {
+                    DeviceEventEmitter.emit('scrollToTopFeed');
+                  }
+                } else if (!event.defaultPrevented) {
+                  navigation.navigate(route.name);
+                }
               }}
             />
           );
 
-          // Compose lands in the middle of the run, between Discover and Algo.
           if (i !== 2) return slot;
           return (
             <React.Fragment key={tab.name}>
@@ -179,8 +161,6 @@ function TabButton({
     open.value = withTiming(focused ? 1 : 0, { duration: duration.base });
   }, [focused, open]);
 
-  // The label fades a little ahead of the pill so it never appears on bare
-  // ground mid-transition.
   const labelStyle = useAnimatedStyle(() => ({
     opacity: open.value,
     maxWidth: open.value * 90,

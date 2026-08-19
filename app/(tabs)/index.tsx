@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { ActivityIndicator, AppState, StyleSheet, View } from 'react-native';
+import { ActivityIndicator, AppState, DeviceEventEmitter, StyleSheet, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useIsFocused, useRouter, usePathname } from 'expo-router';
 import Animated, {
@@ -68,6 +68,15 @@ export default function FeedScreen() {
     }
     prevPathname.current = pathname;
   }, [isFocused, pathname, onRefresh]);
+
+  // Listen for the custom event emitted when tapping the active Feed tab bar icon
+  useEffect(() => {
+    const subscription = DeviceEventEmitter.addListener('scrollToTopFeed', () => {
+      listRef.current?.scrollToOffset?.({ offset: 0, animated: true });
+      onRefresh();
+    });
+    return () => subscription.remove();
+  }, [onRefresh]);
 
   const seenSnapshot = useMemo(
     () => new Set(useVybe.getState().seenIds),
