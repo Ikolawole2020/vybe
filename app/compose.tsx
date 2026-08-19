@@ -13,7 +13,7 @@ import { Image } from 'expo-image';
 import * as ImagePicker from 'expo-image-picker';
 import Animated, { FadeIn, FadeOut, LinearTransition } from 'react-native-reanimated';
 import { AmbientAura } from '@/components/AmbientAura';
-import { Avatar, Button, Chip, Icon, Touchable, VText, haptic } from '@/components/ui';
+import { Avatar, Chip, Icon, Touchable, VText, haptic } from '@/components/ui';
 import { useTheme } from '@/theme/ThemeProvider';
 import { radius, space, type, typography } from '@/theme/tokens';
 import { TOPICS } from '@/data/topics';
@@ -25,7 +25,6 @@ import { uploadImage } from '@/services/db';
 import type { Boundary, DraftPoll, PostKind } from '@/data/types';
 
 const MAX_MEDIA = 4;
-const FOOTER_CLEARANCE = 96;
 const MAX_POLL_OPTIONS = 4;
 
 export default function ComposeScreen() {
@@ -187,6 +186,8 @@ export default function ComposeScreen() {
   return (
     <View style={{ flex: 1 }}>
       <AmbientAura intensity={0.7} />
+      
+      {/* Top Navigation Bar */}
       <View style={[styles.bar, { paddingTop: insets.top + space.md }]}>
         <Touchable onPress={close} feedback="light" hitSlop={10} accessibilityLabel="Close">
           <VText variant="label">Cancel</VText>
@@ -210,14 +211,15 @@ export default function ComposeScreen() {
         </Touchable>
       </View>
 
+      {/* Redesigned Fluid Scrolling Container */}
       <KeyboardAwareScrollView
         style={{ flex: 1 }}
-        bottomOffset={FOOTER_CLEARANCE}
         contentContainerStyle={{
           padding: space.base,
-          paddingBottom: space.xl,
+          paddingBottom: 140,
         }}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <View style={styles.writeRow}>
           <Avatar uri={profile.avatar} size={40} />
@@ -295,8 +297,9 @@ export default function ComposeScreen() {
         </VText>
       ) : null}
 
+      {/* Keyboard-Pinned Sticky Toolbar */}
       <KeyboardStickyView offset={{ closed: 0, opened: 0 }}>
-        <View style={[styles.footer, { borderTopColor: c.divider, paddingBottom: footerInset }]}>
+        <View style={[styles.footer, { borderTopColor: c.divider, backgroundColor: c.surface, paddingBottom: footerInset || space.md }]}>
           <Touchable
             onPress={() => {
               haptic('light');
@@ -534,7 +537,7 @@ function MediaStrip({
                 feedback="light"
                 hitSlop={8}
                 accessibilityLabel={`Remove photo ${i + 1}`}
-                style={[styles.remove, { backgroundColor: c.bg }]}
+                style={[styles.remove, { backgroundColor: c.surfaceElevated }]}
               >
                 <Icon name="x" size={14} color={c.text} />
               </Touchable>
@@ -602,72 +605,70 @@ function PollComposer({
         </Touchable>
       </View>
 
-      {on ? (
-        <Animated.View
-          entering={FadeIn.duration(160)}
-          exiting={FadeOut.duration(120)}
-          layout={LinearTransition.springify()}
-          style={[styles.pollCard, { backgroundColor: c.surface, borderColor: c.border }]}
-        >
-          <TextInput
-            value={question}
-            onChangeText={onQuestion}
-            placeholder="Ask something"
-            placeholderTextColor={c.textMuted}
-            maxLength={140}
-            style={[type.body, styles.pollInput, { color: c.text, borderColor: c.border }]}
-            accessibilityLabel="Poll question"
-          />
+      <Animated.View
+        entering={FadeIn.duration(160)}
+        exiting={FadeOut.duration(120)}
+        layout={LinearTransition.springify()}
+        style={[styles.pollCard, { backgroundColor: c.surface, borderColor: c.border }]}
+      >
+        <TextInput
+          value={question}
+          onChangeText={onQuestion}
+          placeholder="Ask something"
+          placeholderTextColor={c.textMuted}
+          maxLength={140}
+          style={[type.body, styles.pollInput, { color: c.text, borderColor: c.border }]}
+          accessibilityLabel="Poll question"
+        />
 
-          {options.map((opt, i) => (
-            <Animated.View key={i} entering={FadeIn} exiting={FadeOut} style={styles.pollRow}>
-              <TextInput
-                value={opt}
-                onChangeText={(t) => onOption(i, t)}
-                placeholder={`Answer ${i + 1}`}
-                placeholderTextColor={c.textMuted}
-                maxLength={60}
-                style={[
-                  type.body,
-                  styles.pollInput,
-                  { color: c.text, borderColor: c.border, flex: 1 },
-                ]}
-                accessibilityLabel={`Poll answer ${i + 1}`}
-              />
-              {options.length > 2 ? (
-                <Touchable
-                  onPress={() => onRemoveOption(i)}
-                  feedback="light"
-                  hitSlop={8}
-                  accessibilityLabel={`Remove answer ${i + 1}`}
-                >
-                  <Icon name="x" size={18} color={c.textMuted} />
-                </Touchable>
-              ) : null}
-            </Animated.View>
-          ))}
+        {options.map((opt, i) => (
+          <Animated.View key={i} entering={FadeIn} exiting={FadeOut} style={styles.pollRow}>
+            <TextInput
+              value={opt}
+              onChangeText={(t) => onOption(i, t)}
+              placeholder={`Answer ${i + 1}`}
+              placeholderTextColor={c.textMuted}
+              maxLength={60}
+              style={[
+                type.body,
+                styles.pollInput,
+                { color: c.text, borderColor: c.border, flex: 1 },
+              ]}
+              accessibilityLabel={`Poll answer ${i + 1}`}
+            />
+            {options.length > 2 ? (
+              <Touchable
+                onPress={() => onRemoveOption(i)}
+                feedback="light"
+                hitSlop={8}
+                accessibilityLabel={`Remove answer ${i + 1}`}
+              >
+                <Icon name="x" size={18} color={c.textMuted} />
+              </Touchable>
+            ) : null}
+          </Animated.View>
+        ))}
 
-          {options.length < MAX_POLL_OPTIONS ? (
-            <Touchable
-              onPress={onAddOption}
-              feedback="light"
-              accessibilityLabel="Add another answer"
-              style={styles.pollAdd}
-            >
-              <Icon name="plus" size={16} color={c.textSecondary} />
-              <VText variant="caption" secondary>
-                Add another answer
-              </VText>
-            </Touchable>
-          ) : null}
+        {options.length < MAX_POLL_OPTIONS ? (
+          <Touchable
+            onPress={onAddOption}
+            feedback="light"
+            accessibilityLabel="Add another answer"
+            style={styles.pollAdd}
+          >
+            <Icon name="plus" size={16} color={c.textSecondary} />
+            <VText variant="caption" secondary>
+              Add another answer
+            </VText>
+          </Touchable>
+        ) : null}
 
-          <VText variant="micro" color={incomplete ? c.danger : c.textMuted}>
-            {incomplete
-              ? 'A poll needs a question and at least two answers.'
-              : 'One vote each. Results show after you vote.'}
-          </VText>
-        </Animated.View>
-      ) : null}
+        <VText variant="micro" color={incomplete ? c.danger : c.textMuted}>
+          {incomplete
+            ? 'A poll needs a question and at least two answers.'
+            : 'One vote each. Results show after you vote.'}
+        </VText>
+      </Animated.View>
     </View>
   );
 }
@@ -853,12 +854,12 @@ const styles = StyleSheet.create({
   },
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
   input: {
-    minHeight: 120,
-    paddingTop: 6,
+    minHeight: 140,
+    paddingTop: 4,
     textAlignVertical: 'top',
     fontFamily: typography.regular,
-    fontSize: 19,
-    lineHeight: 27,
+    fontSize: 18,
+    lineHeight: 26,
   },
   quotedBox: {
     borderRadius: radius.md,
@@ -912,13 +913,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     minHeight: 24,
-  },
-  pollToggle: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: space.sm,
-    alignSelf: 'flex-start',
-    minHeight: 38,
   },
   pollCard: {
     padding: space.base,

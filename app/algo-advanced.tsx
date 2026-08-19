@@ -30,119 +30,119 @@ export default function AlgoAdvancedScreen() {
   const resetAlgo = useVybe((s) => s.resetAlgo);
 
   return (
-    <View style={{ flex: 1, backgroundColor: c.background }}>
+    <View style={{ flex: 1 }}>
       <AmbientAura />
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
-          paddingTop: insets.top + space.base,
-          paddingBottom: 140,
+          paddingTop: insets.top + space.xl,
+          paddingBottom: 160,
           paddingHorizontal: space.gutter,
+          gap: 36,
         }}
       >
-        <View style={styles.container}>
-          
-          <View style={styles.section}>
-            <Touchable
-              onPress={() => goBack()}
-              feedback="light"
-              hitSlop={10}
-              accessibilityLabel="Back"
-              style={styles.back}
-            >
-              <Icon name="arrow-left" size={20} color={c.text} />
-              <VText variant="label" secondary>
-                Your feed
-              </VText>
-            </Touchable>
-
-            <VText variant="hero">Advanced</VText>
-            <VText variant="body" secondary>
-              These are the actual numbers the ranking uses. Nothing here is hidden or inferred, and
-              nothing else touches your feed.
+        {/* Header Section */}
+        <View style={{ gap: space.sm }}>
+          <Touchable
+            onPress={() => goBack()}
+            feedback="light"
+            hitSlop={10}
+            accessibilityLabel="Back"
+            style={styles.back}
+          >
+            <Icon name="arrow-left" size={20} color={c.text} />
+            <VText variant="label" secondary>
+              Your feed
             </VText>
-          </View>
+          </Touchable>
 
-          <View style={styles.section}>
-            <SectionHead flush label="The six dials" note="What each signal is worth" />
-            <View style={{ gap: space.md }}>
-              {DIAL_META.map((d) => (
-                <Block key={d.key} style={styles.card}>
-                  <Slider
-                    label={d.label}
-                    value={algo.dials[d.key as keyof AlgoDials]}
-                    onChange={(v) => setDial(d.key as keyof AlgoDials, v)}
-                    tone={d.key === 'crowd' ? c.warning : c.accent}
-                    leftLabel={d.low}
-                    rightLabel={d.high}
-                    hint={d.blurb}
-                  />
-                </Block>
-              ))}
-            </View>
-          </View>
+          <VText variant="hero">Advanced</VText>
+          <VText variant="body" secondary>
+            These are the actual numbers the ranking uses. Nothing here is hidden or inferred, and
+            nothing else touches your feed.
+          </VText>
+        </View>
 
-          <View style={styles.section}>
-            <SectionHead flush label="Every topic" note="The weight applied to each one" />
-            <View style={{ gap: space.md }}>
-              {TOPICS.map((t) => (
-                <Block key={t.id} style={styles.card}>
-                  <View style={styles.topicHead}>
-                    <View
-                      style={[styles.topicIcon, { borderColor: t.hue, backgroundColor: alpha(t.hue, 0.12) }]}
-                    >
-                      <Icon name={t.glyph as any} size={15} color={t.hue} />
-                    </View>
-                    <Slider
-                      label={t.label}
-                      value={algo.topicWeights[t.id] ?? 0}
-                      onChange={(v) => setTopicWeight(t.id, v, 'panel')}
-                      bipolar
-                      tone={t.hue}
-                      leftLabel="Show me fewer"
-                      rightLabel="Show me more"
-                    />
+        {/* The Six Dials Section */}
+        <View style={{ gap: space.md }}>
+          <SectionHead flush label="The six dials" note="What each signal is worth" />
+          <View style={{ gap: space.md }}>
+            {DIAL_META.map((d) => (
+              <Block key={d.key} style={styles.card}>
+                <Slider
+                  label={d.label}
+                  value={algo.dials[d.key as keyof AlgoDials]}
+                  onChange={(v) => setDial(d.key as keyof AlgoDials, v)}
+                  tone={d.key === 'crowd' ? c.warning : c.accent}
+                  leftLabel={d.low}
+                  rightLabel={d.high}
+                  hint={d.blurb}
+                />
+              </Block>
+            ))}
+          </View>
+        </View>
+
+        {/* Every Topic Section */}
+        <View style={{ gap: space.md }}>
+          <SectionHead flush label="Every topic" note="The weight applied to each one" />
+          <View style={{ gap: space.md }}>
+            {TOPICS.map((t) => (
+              <Block key={t.id} style={styles.card}>
+                <View style={styles.topicHead}>
+                  <View
+                    style={[styles.topicIcon, { borderColor: t.hue, backgroundColor: alpha(t.hue, 0.12) }]}
+                  >
+                    <Icon name={t.glyph as any} size={15} color={t.hue} />
                   </View>
-                </Block>
-              ))}
-            </View>
+                  <Slider
+                    label={t.label}
+                    value={algo.topicWeights[t.id] ?? 0}
+                    onChange={(v) => setTopicWeight(t.id, v, 'panel')}
+                    bipolar
+                    tone={t.hue}
+                    leftLabel="Show me fewer"
+                    rightLabel="Show me more"
+                  />
+                </View>
+              </Block>
+            ))}
           </View>
+        </View>
 
-          <View style={styles.section}>
-            <SectionHead
-              flush
-              label="Constellation"
-              note="Drag a topic to the centre to see more of it"
+        {/* Constellation Section */}
+        <View style={{ gap: space.md }}>
+          <SectionHead
+            flush
+            label="Constellation"
+            note="Drag a topic to the centre to see more of it"
+          />
+          <FeedGenome />
+        </View>
+
+        {/* Timed Boosts Section */}
+        <TemporaryModes />
+
+        {/* Daily Limit Section */}
+        <AttentionBudgetCard />
+
+        {/* History Section */}
+        <View style={{ gap: space.md }}>
+          <SectionHead flush label="History" note="Every change you have made, reversible" />
+          <View style={{ gap: space.sm }}>
+            <Button
+              label="Open the algorithm ledger"
+              glyph="list"
+              variant="ghost"
+              onPress={() => router.push('/ledger')}
             />
-            <FeedGenome />
+            <Button
+              label="Reset everything to neutral"
+              glyph="trash-2"
+              variant="ghost"
+              onPress={resetAlgo}
+            />
           </View>
-
-          <View style={styles.section}>
-            <TemporaryModes />
-          </View>
-
-          <View style={styles.section}>
-            <AttentionBudgetCard />
-          </View>
-
-          <View style={styles.section}>
-            <SectionHead flush label="History" note="Every change you have made, reversible" />
-            <View style={{ gap: space.sm }}>
-              <Button
-                label="Open the algorithm ledger"
-                glyph="list"
-                variant="ghost"
-                onPress={() => router.push('/ledger')}
-              />
-              <Button
-                label="Reset everything to neutral"
-                glyph="trash-2"
-                variant="ghost"
-                onPress={resetAlgo}
-              />
-            </View>
-          </View>
-
         </View>
       </ScrollView>
       <TopScrim />
@@ -317,14 +317,6 @@ function AttentionBudgetCard() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flexDirection: 'column',
-    gap: space.xl,
-  },
-  section: {
-    flexDirection: 'column',
-    gap: space.md,
-  },
   back: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 },
   card: { padding: space.base, gap: space.md },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
