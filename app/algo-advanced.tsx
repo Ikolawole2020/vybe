@@ -46,7 +46,7 @@ export default function AlgoAdvancedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + space.base,
-          paddingBottom: insets.bottom + space.xxl,
+          paddingBottom: 140, // Keeps bottom items clear of the navigation bar
           paddingHorizontal: space.gutter,
           gap: space.xl,
         }}
