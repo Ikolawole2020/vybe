@@ -20,15 +20,6 @@ import { TOPICS } from '@/data/topics';
 import { useVybe } from '@/store/useVybe';
 import type { AlgoDials } from '@/data/types';
 
-/**
- * Everything the plain-language screen deliberately does not say.
- *
- * This is the app's original thesis intact — the six dials that actually run the
- * ranking, every topic as a signed weight, the constellation, timed boosts and
- * the full change history. It is behind a door not because it is shameful but
- * because reading it is a choice, and making it the first thing anyone saw meant
- * most people never got past it.
- */
 export default function AlgoAdvancedScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
@@ -46,100 +37,110 @@ export default function AlgoAdvancedScreen() {
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{
           paddingTop: insets.top + space.base,
-          paddingBottom: 140, // Keeps bottom items clear of the navigation bar
+          paddingBottom: 140,
           paddingHorizontal: space.gutter,
-          gap: space.xl,
         }}
       >
-        <Reveal index={0} style={{ gap: space.md }}>
-          <Touchable
-            onPress={() => goBack()}
-            feedback="light"
-            hitSlop={10}
-            accessibilityLabel="Back"
-            style={styles.back}
-          >
-            <Icon name="arrow-left" size={20} color={c.text} />
-            <VText variant="label" secondary>
-              Your feed
+        {/* Main container with clean vertical gap between all sections */}
+        <View style={{ gap: space.xl }}>
+          
+          <Reveal index={0} style={{ gap: space.md }}>
+            <Touchable
+              onPress={() => goBack()}
+              feedback="light"
+              hitSlop={10}
+              accessibilityLabel="Back"
+              style={styles.back}
+            >
+              <Icon name="arrow-left" size={20} color={c.text} />
+              <VText variant="label" secondary>
+                Your feed
+              </VText>
+            </Touchable>
+
+            <VText variant="hero">Advanced</VText>
+            <VText variant="body" secondary>
+              These are the actual numbers the ranking uses. Nothing here is hidden or inferred, and
+              nothing else touches your feed.
             </VText>
-          </Touchable>
+          </Reveal>
 
-          <VText variant="hero">Advanced</VText>
-          <VText variant="body" secondary>
-            These are the actual numbers the ranking uses. Nothing here is hidden or inferred, and
-            nothing else touches your feed.
-          </VText>
-        </Reveal>
+          <Reveal index={1} style={{ gap: space.md }}>
+            <SectionHead flush label="The six dials" note="What each signal is worth" />
+            <View style={{ gap: space.md }}>
+              {DIAL_META.map((d) => (
+                <Block key={d.key} style={styles.card}>
+                  <Slider
+                    label={d.label}
+                    value={algo.dials[d.key as keyof AlgoDials]}
+                    onChange={(v) => setDial(d.key as keyof AlgoDials, v)}
+                    tone={d.key === 'crowd' ? c.warning : c.accent}
+                    leftLabel={d.low}
+                    rightLabel={d.high}
+                    hint={d.blurb}
+                  />
+                </Block>
+              ))}
+            </View>
+          </Reveal>
 
-        <Reveal index={1} style={{ gap: space.md }}>
-          <SectionHead flush label="The six dials" note="What each signal is worth" />
-          {DIAL_META.map((d) => (
-            <Block key={d.key} style={styles.card}>
-              <Slider
-                label={d.label}
-                value={algo.dials[d.key as keyof AlgoDials]}
-                onChange={(v) => setDial(d.key as keyof AlgoDials, v)}
-                tone={d.key === 'crowd' ? c.warning : c.accent}
-                leftLabel={d.low}
-                rightLabel={d.high}
-                hint={d.blurb}
+          <Reveal index={2} style={{ gap: space.md }}>
+            <SectionHead flush label="Every topic" note="The weight applied to each one" />
+            <View style={{ gap: space.md }}>
+              {TOPICS.map((t) => (
+                <Block key={t.id} style={styles.card}>
+                  <View style={styles.topicHead}>
+                    <View
+                      style={[styles.topicIcon, { borderColor: t.hue, backgroundColor: alpha(t.hue, 0.12) }]}
+                    >
+                      <Icon name={t.glyph as any} size={15} color={t.hue} />
+                    </View>
+                    <Slider
+                      label={t.label}
+                      value={algo.topicWeights[t.id] ?? 0}
+                      onChange={(v) => setTopicWeight(t.id, v, 'panel')}
+                      bipolar
+                      tone={t.hue}
+                      leftLabel="Show me fewer"
+                      rightLabel="Show me more"
+                    />
+                  </View>
+                </Block>
+              ))}
+            </View>
+          </Reveal>
+
+          <Reveal index={3} style={{ gap: space.md }}>
+            <SectionHead
+              flush
+              label="Constellation"
+              note="Drag a topic to the centre to see more of it"
+            />
+            <FeedGenome />
+          </Reveal>
+
+          <TemporaryModes />
+
+          <AttentionBudgetCard />
+
+          <View style={{ gap: space.md }}>
+            <SectionHead flush label="History" note="Every change you have made, reversible" />
+            <View style={{ gap: space.sm }}>
+              <Button
+                label="Open the algorithm ledger"
+                glyph="list"
+                variant="ghost"
+                onPress={() => router.push('/ledger')}
               />
-            </Block>
-          ))}
-        </Reveal>
+              <Button
+                label="Reset everything to neutral"
+                glyph="trash-2"
+                variant="ghost"
+                onPress={resetAlgo}
+              />
+            </View>
+          </View>
 
-        <Reveal index={2} style={{ gap: space.md }}>
-          <SectionHead flush label="Every topic" note="The weight applied to each one" />
-          {TOPICS.map((t) => (
-            <Block key={t.id} style={styles.card}>
-              <View style={styles.topicHead}>
-                <View
-                  style={[styles.topicIcon, { borderColor: t.hue, backgroundColor: alpha(t.hue, 0.12) }]}
-                >
-                  <Icon name={t.glyph as any} size={15} color={t.hue} />
-                </View>
-                <Slider
-                  label={t.label}
-                  value={algo.topicWeights[t.id] ?? 0}
-                  onChange={(v) => setTopicWeight(t.id, v, 'panel')}
-                  bipolar
-                  tone={t.hue}
-                  leftLabel="Show me fewer"
-                  rightLabel="Show me more"
-                />
-              </View>
-            </Block>
-          ))}
-        </Reveal>
-
-        <Reveal index={3} style={{ gap: space.md }}>
-          <SectionHead
-            flush
-            label="Constellation"
-            note="Drag a topic to the centre to see more of it"
-          />
-          <FeedGenome />
-        </Reveal>
-
-        <TemporaryModes />
-
-        <AttentionBudgetCard />
-
-        <View style={{ gap: space.md }}>
-          <SectionHead flush label="History" note="Every change you have made, reversible" />
-          <Button
-            label="Open the algorithm ledger"
-            glyph="list"
-            variant="ghost"
-            onPress={() => router.push('/ledger')}
-          />
-          <Button
-            label="Reset everything to neutral"
-            glyph="trash-2"
-            variant="ghost"
-            onPress={resetAlgo}
-          />
         </View>
       </ScrollView>
       <TopScrim />
