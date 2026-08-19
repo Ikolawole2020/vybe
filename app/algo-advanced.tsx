@@ -41,10 +41,9 @@ export default function AlgoAdvancedScreen() {
           paddingHorizontal: space.gutter,
         }}
       >
-        {/* Main container with clean vertical gap between all sections */}
-        <View style={{ gap: space.xl }}>
+        <View style={styles.container}>
           
-          <Reveal index={0} style={{ gap: space.md }}>
+          <Reveal index={0} style={styles.section}>
             <Touchable
               onPress={() => goBack()}
               feedback="light"
@@ -65,7 +64,7 @@ export default function AlgoAdvancedScreen() {
             </VText>
           </Reveal>
 
-          <Reveal index={1} style={{ gap: space.md }}>
+          <Reveal index={1} style={styles.section}>
             <SectionHead flush label="The six dials" note="What each signal is worth" />
             <View style={{ gap: space.md }}>
               {DIAL_META.map((d) => (
@@ -84,7 +83,7 @@ export default function AlgoAdvancedScreen() {
             </View>
           </Reveal>
 
-          <Reveal index={2} style={{ gap: space.md }}>
+          <Reveal index={2} style={styles.section}>
             <SectionHead flush label="Every topic" note="The weight applied to each one" />
             <View style={{ gap: space.md }}>
               {TOPICS.map((t) => (
@@ -110,7 +109,7 @@ export default function AlgoAdvancedScreen() {
             </View>
           </Reveal>
 
-          <Reveal index={3} style={{ gap: space.md }}>
+          <Reveal index={3} style={styles.section}>
             <SectionHead
               flush
               label="Constellation"
@@ -119,11 +118,15 @@ export default function AlgoAdvancedScreen() {
             <FeedGenome />
           </Reveal>
 
-          <TemporaryModes />
+          <View style={styles.section}>
+            <TemporaryModes />
+          </View>
 
-          <AttentionBudgetCard />
+          <View style={styles.section}>
+            <AttentionBudgetCard />
+          </View>
 
-          <View style={{ gap: space.md }}>
+          <View style={styles.section}>
             <SectionHead flush label="History" note="Every change you have made, reversible" />
             <View style={{ gap: space.sm }}>
               <Button
@@ -148,7 +151,6 @@ export default function AlgoAdvancedScreen() {
   );
 }
 
-/** Time-boxed overrides with a live countdown, so nothing you set is forever. */
 function TemporaryModes() {
   const { c } = useTheme();
   const algo = useVybe((s) => s.algo);
@@ -316,6 +318,14 @@ function AttentionBudgetCard() {
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'column',
+    gap: space.xl,
+  },
+  section: {
+    flexDirection: 'column',
+    gap: space.md,
+  },
   back: { flexDirection: 'row', alignItems: 'center', gap: 6, minHeight: 44 },
   card: { padding: space.base, gap: space.md },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },

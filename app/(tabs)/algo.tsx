@@ -21,19 +21,6 @@ const EDGE = 0.05;
 const MORE = 0.75;
 const LESS = -0.6;
 
-/**
- * Your feed, in three questions.
- *
- * This screen used to show the engine: six named dials, a draggable weight
- * constellation, and every topic as a signed number. All of it was true and
- * none of it was legible — the first thing anyone asked was what it meant.
- *
- * So the surface now asks only what a person can answer about themselves — more
- * of what, less of what, and how adventurous it should be — in the same words
- * setup used, because that is the one vocabulary the user has already met. The
- * dials still exist and still run the ranking; they live behind Advanced, where
- * wanting to see the arithmetic is the reason you are there.
- */
 export default function AlgoScreen() {
   const { c } = useTheme();
   const insets = useSafeAreaInsets();
@@ -154,13 +141,6 @@ export default function AlgoScreen() {
   );
 }
 
-/**
- * A list of chosen topics plus the ones still going spare.
- *
- * Adding and removing are the same gesture in two places rather than a
- * three-state toggle — "tap once for more, twice for less, three times for
- * neutral" is exactly the kind of cleverness that made the old screen unusable.
- */
 function TopicPicker({
   title,
   blurb,
@@ -184,7 +164,7 @@ function TopicPicker({
   const [adding, setAdding] = useState(false);
 
   return (
-    <View style={{ gap: space.md }}>
+    <View style={{ gap: space.md, marginBottom: space.sm }}>
       <View style={{ gap: 4 }}>
         <VText variant="heading">{title}</VText>
         <VText variant="caption" secondary>
@@ -224,7 +204,7 @@ function TopicPicker({
       ) : null}
 
       {adding ? (
-        <Animated.View entering={FadeIn} exiting={FadeOut} style={styles.chips}>
+        <Animated.View entering={FadeIn} exiting={FadeOut} style={[styles.chips, styles.addingBox]}>
           {spare.map((t) => (
             <Chip
               key={t.id}
@@ -239,12 +219,11 @@ function TopicPicker({
         </Animated.View>
       ) : null}
 
-      <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.border }} />
+      <View style={{ height: StyleSheet.hairlineWidth, backgroundColor: c.border, marginTop: space.xs }} />
     </View>
   );
 }
 
-/** One temperament, as a sentence rather than a dial set. */
 function FeelCard({
   id,
   active,
@@ -292,6 +271,7 @@ function FeelCard({
 
 const styles = StyleSheet.create({
   chips: { flexDirection: 'row', flexWrap: 'wrap', gap: space.sm },
+  addingBox: { marginTop: space.xs, marginBottom: space.xs },
   note: { flexDirection: 'row', alignItems: 'flex-start', gap: space.md },
   feel: {
     flexDirection: 'row',
