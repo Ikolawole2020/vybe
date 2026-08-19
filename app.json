@@ -1,0 +1,103 @@
+{
+  "expo": {
+    "name": "Vybe",
+    "slug": "vybe",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/images/icon.png",
+    "scheme": "vybe",
+    "userInterfaceStyle": "automatic",
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.vybeee.app",
+      "infoPlist": {
+        "NSFaceIDUsageDescription": "Allow Vybe to use Face ID to quickly and securely sign in.",
+        "NSMicrophoneUsageDescription": "Vybe needs microphone access to record voice notes in chats and comments."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/icon.png",
+        "backgroundColor": "#08080C"
+      },
+      "package": "com.vybe.app",
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.INTERNET",
+        "android.permission.ACCESS_NETWORK_STATE",
+        "android.permission.VIBRATE",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.FOREGROUND_SERVICE",
+        "android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK"
+      ]
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-font",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Vybe needs access to your photos so you can attach them to a post. Nothing is uploaded until you post."
+        }
+      ],
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 180,
+          "resizeMode": "contain",
+          "backgroundColor": "#08080C",
+          "dark": {
+            "backgroundColor": "#08080C"
+          }
+        }
+      ],
+      [
+        "expo-local-authentication",
+        {
+          "faceIDPermission": "Allow Vybe to use Face ID to quickly and securely sign in."
+        }
+      ],
+      "expo-secure-store",
+      [
+        "expo-notifications",
+        {
+          "color": "#D2F34C",
+          "defaultChannel": "default"
+        }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Vybe needs microphone access to record voice notes in chats and comments."
+        }
+      ],
+      "expo-asset"
+    ],
+    "experiments": {
+      "typedRoutes": true,
+      "reactCompiler": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "de3526d9-ba39-43b1-bbac-538101a1e5c3"
+      }
+    },
+    "owner": "vercetti.dev",
+    "updates": {
+      "url": "https://u.expo.dev/de3526d9-ba39-43b1-bbac-538101a1e5c3"
+    },
+    "runtimeVersion": {
+      "policy": "appVersion"
+    }
+  }
+}

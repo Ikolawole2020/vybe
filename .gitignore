@@ -1,0 +1,80 @@
+# Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
+
+# dependencies
+node_modules/
+
+# Expo
+.expo/
+dist/
+web-build/
+expo-env.d.ts
+
+# Native
+.kotlin/
+*.orig.*
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+
+# Signing and build outputs.
+# `*.keystore` is the one that matters: an Android release is signed with it,
+# and a committed keystore cannot be un-leaked — anyone holding it can ship an
+# update that Play will accept as yours. Back it up somewhere private instead.
+*.keystore
+keystore.properties
+*.apk
+*.aab
+.gradle/
+*.hprof
+
+# Firebase / Google config — project identifiers, not meant for a public repo.
+google-services.json
+GoogleService-Info.plist
+
+# EAS build state (eas.json itself is tracked)
+.eas/
+
+# Metro
+.metro-health-check*
+
+# debug
+npm-debug.*
+yarn-debug.*
+yarn-error.*
+*.log
+
+# editors
+.vscode/
+.idea/
+*.swp
+
+# macOS
+.DS_Store
+*.pem
+
+# local env files
+.env*.local
+
+# typescript
+*.tsbuildinfo
+
+# generated native folders
+/ios
+/android
+
+# Env — .env holds real project credentials. Only .env.example is tracked.
+.env
+.env.*
+!.env.example
+
+# Built APK produced by `npm run build:apk`.
+vybe.apk
+
+# Local editor/agent config.
+.claude/
+
+# Supabase CLI scratch: which project this machine is linked to, and the
+# remote's component versions. Local state, re-created by `supabase link`.
+supabase/.temp/

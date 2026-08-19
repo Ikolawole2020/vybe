@@ -1,0 +1,2 @@
+ALTER TABLE posts 
+ADD COLUMN IF NOT EXISTS quote_post_id uuid REFERENCES posts(id) ON DELETE SET NULL;ss

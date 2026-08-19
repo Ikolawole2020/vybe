@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- The design is dark on purpose. Declaring it stops iOS Mail and Outlook
+         from "helpfully" inverting a palette that is already dark. -->
+    <meta name="color-scheme" content="dark" />
+    <meta name="supported-color-schemes" content="dark" />
+    <title>Your Vybe code</title>
+  </head>
+  <body
+    style="margin: 0; padding: 0; background-color: #08090a; -webkit-font-smoothing: antialiased"
+  >
+    <!-- Inbox preview line. The code goes here too, so the common case — glance
+         at the notification, type six digits — never needs the email opened. -->
+    <div
+      style="
+        display: none;
+        max-height: 0;
+        overflow: hidden;
+        opacity: 0;
+        mso-hide: all;
+        font-size: 1px;
+        line-height: 1px;
+        color: #08090a;
+      "
+    >
+      {{ .Token }} is your Vybe confirmation code.
+    </div>
+
+    <table
+      role="presentation"
+      cellpadding="0"
+      cellspacing="0"
+      border="0"
+      width="100%"
+      bgcolor="#08090A"
+      style="background-color: #08090a"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 16px">
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            border="0"
+            width="600"
+            style="width: 100%; max-width: 600px"
+          >
+            <!-- Wordmark -->
+            <tr>
+              <td
+                style="
+                  padding: 0 0 28px;
+                  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                    Helvetica, Arial, sans-serif;
+                  font-size: 19px;
+                  font-weight: 700;
+                  letter-spacing: -0.4px;
+                  color: #f3f5f1;
+                "
+              >
+                Vybe
+              </td>
+            </tr>
+
+            <!-- Card -->
+            <tr>
+              <td
+                bgcolor="#17181C"
+                style="
+                  background-color: #17181c;
+                  border-radius: 24px;
+                  padding: 40px 32px;
+                  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                    Helvetica, Arial, sans-serif;
+                "
+              >
+                <h1
+                  style="
+                    margin: 0 0 12px;
+                    font-size: 28px;
+                    line-height: 1.15;
+                    font-weight: 700;
+                    letter-spacing: -0.8px;
+                    color: #f3f5f1;
+                  "
+                >
+                  Confirm your email.
+                </h1>
+
+                <p
+                  style="
+                    margin: 0 0 32px;
+                    font-size: 16px;
+                    line-height: 1.5;
+                    color: #b4b9be;
+                  "
+                >
+                  Enter this code in the app to finish making your account.
+                </p>
+
+                <!-- The code. Big, spaced, and selectable as plain text — an
+                     image or a button would both break copy-and-paste. -->
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  border="0"
+                  width="100%"
+                >
+                  <tr>
+                    <td
+                      align="center"
+                      bgcolor="#D2F34C"
+                      style="
+                        background-color: #d2f34c;
+                        border-radius: 16px;
+                        padding: 24px 16px;
+                        font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI',
+                          Roboto, Helvetica, Arial, sans-serif;
+                        font-size: 38px;
+                        font-weight: 700;
+                        letter-spacing: 10px;
+                        /* Letter-spacing also trails the last digit, which
+                           drags the code off-centre by half of it. */
+                        text-indent: 10px;
+                        line-height: 1;
+                        color: #12160a;
+                      "
+                    >
+                      {{ .Token }}
+                    </td>
+                  </tr>
+                </table>
+
+                <p
+                  style="
+                    margin: 24px 0 0;
+                    font-size: 14px;
+                    line-height: 1.5;
+                    color: #767c84;
+                  "
+                >
+                  The code expires in an hour. If you did not sign up for Vybe, you can ignore
+                  this email — nothing was created.
+                </p>
+              </td>
+            </tr>
+
+            <!-- Footer -->
+            <tr>
+              <td
+                style="
+                  padding: 24px 8px 0;
+                  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+                    Helvetica, Arial, sans-serif;
+                  font-size: 13px;
+                  line-height: 1.5;
+                  color: #767c84;
+                "
+              >
+                Sent to {{ .Email }} because someone used it to sign up for Vybe.
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
