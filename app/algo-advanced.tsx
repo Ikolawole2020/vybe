@@ -8,7 +8,6 @@ import Svg, { Circle } from 'react-native-svg';
 import { AmbientAura } from '@/components/AmbientAura';
 import { TopScrim } from '@/components/TopScrim';
 import { Block } from '@/components/ui/Surface';
-import { Reveal } from '@/components/ui/Reveal';
 import { SectionHead } from '@/components/ui/ScreenTitle';
 import { FeedGenome } from '@/components/algo/FeedGenome';
 import { Slider } from '@/components/ui/Slider';
@@ -31,7 +30,7 @@ export default function AlgoAdvancedScreen() {
   const resetAlgo = useVybe((s) => s.resetAlgo);
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={{ flex: 1, backgroundColor: c.background }}>
       <AmbientAura />
       <ScrollView
         showsVerticalScrollIndicator={false}
@@ -43,7 +42,7 @@ export default function AlgoAdvancedScreen() {
       >
         <View style={styles.container}>
           
-          <Reveal index={0} style={styles.section}>
+          <View style={styles.section}>
             <Touchable
               onPress={() => goBack()}
               feedback="light"
@@ -62,9 +61,9 @@ export default function AlgoAdvancedScreen() {
               These are the actual numbers the ranking uses. Nothing here is hidden or inferred, and
               nothing else touches your feed.
             </VText>
-          </Reveal>
+          </View>
 
-          <Reveal index={1} style={styles.section}>
+          <View style={styles.section}>
             <SectionHead flush label="The six dials" note="What each signal is worth" />
             <View style={{ gap: space.md }}>
               {DIAL_META.map((d) => (
@@ -81,9 +80,9 @@ export default function AlgoAdvancedScreen() {
                 </Block>
               ))}
             </View>
-          </Reveal>
+          </View>
 
-          <Reveal index={2} style={styles.section}>
+          <View style={styles.section}>
             <SectionHead flush label="Every topic" note="The weight applied to each one" />
             <View style={{ gap: space.md }}>
               {TOPICS.map((t) => (
@@ -107,16 +106,16 @@ export default function AlgoAdvancedScreen() {
                 </Block>
               ))}
             </View>
-          </Reveal>
+          </View>
 
-          <Reveal index={3} style={styles.section}>
+          <View style={styles.section}>
             <SectionHead
               flush
               label="Constellation"
               note="Drag a topic to the centre to see more of it"
             />
             <FeedGenome />
-          </Reveal>
+          </View>
 
           <View style={styles.section}>
             <TemporaryModes />
